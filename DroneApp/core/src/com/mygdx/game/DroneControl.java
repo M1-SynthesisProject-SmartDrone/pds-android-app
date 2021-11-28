@@ -160,7 +160,15 @@ public class DroneControl {
     }
 
     public void setMotorPercentage(double motorPercentage) {
-        this.motorPercentage = motorPercentage;
+        if(motorPercentage > 1){
+            motorPercentage = 1;
+        }
+        else if(motorPercentage < -1){
+            motorPercentage = -1;
+        }
+        else{
+            this.motorPercentage = motorPercentage;
+        }
     }
 
     public int getRotation() {
