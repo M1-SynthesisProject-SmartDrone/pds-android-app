@@ -20,6 +20,7 @@ public class DroneControl {
     public static final int NO_ROTATION = 0;
 
 
+    boolean droneArmed;         // true if the drone is armed, false if not
     boolean security;           // true if security is On, false if not
     float frontMove;            // indicate nature of front move by sign and intensity by the number | front is positive, back is negative
     float lateralMove;          // indicate nature of lateral move by sign and intensity by the number | left is negative, right is positive
@@ -34,6 +35,7 @@ public class DroneControl {
     // ----------------------
 
     private DroneControl(){
+        droneArmed = false;
         security = true;
         frontMove = 0;
         lateralMove = 0;
@@ -62,6 +64,18 @@ public class DroneControl {
         }
         else{
             security = true;
+        }
+    }
+
+    public void armDrone(){
+        if (droneArmed == false){
+            droneArmed = true;
+        }
+    }
+
+    public void disarmDrone(){
+        if(droneArmed == true){
+            droneArmed = false;
         }
     }
 
@@ -108,6 +122,14 @@ public class DroneControl {
     }
 
     // ------ Getters and setters ------
+
+    public boolean isDroneArmed() {
+        return droneArmed;
+    }
+
+    public void setDroneArmed(boolean droneArmed) {
+        this.droneArmed = droneArmed;
+    }
 
     public boolean isSecurity() {
         return security;

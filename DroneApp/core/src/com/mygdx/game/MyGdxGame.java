@@ -215,7 +215,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 		rightRotationRectangleHeight = (float) (screenHeight*0.3);
 
 		mobileSliderRectangleXPosition = (float) (screenWidth*0.9) - 35;
-		mobileSliderRectangleYPosition = (float) (screenHeight*0.1);
+		mobileSliderRectangleYPosition = (float) (screenHeight*0.4);
 		mobileSliderRectangleWidth = 100;
 		mobileSliderRectangleHeight = 40;
 
@@ -225,16 +225,16 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 		usedPowerRectangleHeight = (float) (screenHeight*0.8);
 
 		unUsedPowerRectangleXPosition = (float) (screenWidth*0.9);
-		unUsedPowerRectangleYPosition = (float) (screenHeight*0.1);
+		unUsedPowerRectangleYPosition = (float) (screenHeight*0.4);
 		unUsedPowerRectangleWidth = 30;
 		unUsedPowerRectangleHeight = 0;
 
-		engineControlRectangleXPosition = (float) (screenWidth*0.45);
+		engineControlRectangleXPosition = (float) (screenWidth*0.4);
 		engineControlRectangleYPosition = 150;
 		engineControlRectangleWidth = 200;
 		engineControlRectangleHeight = 150;
 		minEngineControlYPos =  (float) (screenHeight*0.1);
-		maxEngineControlYPos = (float) (screenHeight*0.9);
+		maxEngineControlYPos = (float) (screenHeight*0.746);
 
 	}
 
@@ -539,6 +539,9 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 
 		mobileElement.setPosition(font.x, font.y);
 		controller.setMoves(0, 0);
+		mobileSliderRectangle.setY(mobileSliderRectangleYPosition);
+		unUsedPowerRectangle.setHeight(0);
+
 		if(screen == CurrentScreen.JOYSTICK) {
 
 			if (leftRotationRectangle.contains(touchPos.x, touchPos.y)) {
@@ -562,7 +565,8 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 					mobileSliderRectangle.setY(touchPos.y - (mobileSliderRectangleHeight / 2));
 					unUsedPowerRectangle.setHeight(touchPos.y - unUsedPowerRectangle.y);
 
-					double powerPercentage = (((touchPos.y - unUsedPowerRectangle.y) / (usedPowerRectangleHeight / 100)) / 100);
+					//double powerPercentage = (((touchPos.y - unUsedPowerRectangle.y) / (usedPowerRectangleHeight / 100)) / 100);
+					double powerPercentage = ((touchPos.y-25 - unUsedPowerRectangleYPosition)/ usedPowerRectangleHeight/4)*10;
 					controller.setMotorPercentage(powerPercentage);
 				}
 			} else if (mobileElement.contains(touchPos.x, touchPos.y)) {
