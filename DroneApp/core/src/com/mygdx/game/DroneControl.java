@@ -156,7 +156,7 @@ public class DroneControl {
         mapValue.put("forwardmove", format.format(getFrontMove()));
         mapValue.put("leftmove", format.format(getLateralMove()));
         mapValue.put("motorpower", format.format(getMotorPercentage()));
-        mapValue.put("leftRotation", format.format(getRotation()));
+        mapValue.put("leftrotation", format.format(getRotation()));
         return gson.toJson(mapValue).replace("\n", "");
     }
 
