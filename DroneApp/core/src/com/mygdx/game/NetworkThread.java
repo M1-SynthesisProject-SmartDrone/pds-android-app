@@ -17,13 +17,30 @@ public class NetworkThread extends Thread{
         this.ip = ip;
         this.port = Integer.parseInt(port);
     }
+
+    /**
+     * Ask to the server to arm the drone
+     *
+     * @return true if drone has been armed, false if not
+     */
+    public boolean armDrone() throws IOException {
+        boolean isArmed = client.armDrone();
+        if(isArmed){
+            controller.armDrone();
+            return true;
+        }
+        return false;
+    }
+
+    public void disarmDrone() throws IOException {
+        client.disarmDrone() ;
+        controller.disarmDrone();
+    }
     
     @Override
     public void run() {
         if(isPrepared) {
             try {
-                //client = new DroneNetwork("10.77.46.39", 6969);
-//            client = new DroneNetwork("12.0.2.2", 5554);
                 client = new DroneNetwork(ip, port);
                 controller = controller.getInstance();
                 running = true;
@@ -36,6 +53,12 @@ public class NetworkThread extends Thread{
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            boolean isArmed;
+            try {
+               isArmed = armDrone();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
             while (running) {
                 try {
@@ -44,11 +67,19 @@ public class NetworkThread extends Thread{
                     e.printStackTrace();
                 }
             }
+
+            try {
+                disarmDrone();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             try {
                 client.endConnection();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+
         }
     }
 

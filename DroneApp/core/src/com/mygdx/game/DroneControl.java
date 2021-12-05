@@ -67,12 +67,18 @@ public class DroneControl {
         }
     }
 
+    /**
+     * Arm the drone
+     */
     public void armDrone(){
         if (droneArmed == false){
             droneArmed = true;
         }
     }
 
+    /**
+     * Disarm the drone
+     */
     public void disarmDrone(){
         if(droneArmed == true){
             droneArmed = false;

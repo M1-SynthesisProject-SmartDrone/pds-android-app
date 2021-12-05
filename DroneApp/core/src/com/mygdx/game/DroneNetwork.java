@@ -59,6 +59,43 @@ public class DroneNetwork {
     }
 
     /**
+     * Arm the drone
+     *
+     * @return boolean to say if the drone has been correctly armed
+     * @throws IOException
+     */
+    public boolean armDrone() throws IOException {
+        // Send the request for Drone Armement
+        buffer = "{ArmDrone : True}".getBytes();
+        dataSent = new DatagramPacket(buffer, buffer.length, adress, port);
+        socket.setBroadcast(true);
+        socket.send(dataSent);
+        System.out.println(" --- Asked for Drone Arming ... ");
+
+        // Receiving the answer of the server
+        boolean returnValue = true;
+        DatagramPacket response = new DatagramPacket(buffer, buffer.length);
+        socket.receive(response);
+        String received = new String( response.getData(), 0, response.getLength());
+
+        if(!received.contentEquals("{ArmDrone : True}")){
+            returnValue= false;
+        }
+
+        return returnValue;
+    }
+
+    public void disarmDrone() throws IOException {
+        // Send the request for Drone Disarmament
+        buffer = "{ArmDrone : False}".getBytes();
+        dataSent = new DatagramPacket(buffer, buffer.length, adress, port);
+        socket.setBroadcast(true);
+        socket.send(dataSent);
+        System.out.println(" --- Asked for Drone Disarming ... ");
+
+    }
+
+    /**
      * End connection with the server
      */
     public void endConnection() throws IOException {
