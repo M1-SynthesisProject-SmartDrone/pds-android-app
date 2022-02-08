@@ -9,6 +9,11 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
+import Networkdata.ArmDrone;
+import Networkdata.RequestType;
+import Networkdata.TakeOffDrone;
+import communicationAPI.Request;
+import communicationAPI.RequestImpl;
 import sun.awt.X11.XSystemTrayPeer;
 
 public class DroneNetwork {
@@ -21,6 +26,7 @@ public class DroneNetwork {
 
     private InetAddress adress;
     private int port;
+    private DroneControl drone;
     private DatagramPacket dataSent;
     private DatagramSocket socket;
 
@@ -42,6 +48,8 @@ public class DroneNetwork {
         this.port = port;
         socket = new DatagramSocket();
         socket.setSoTimeout(30000);
+        System.out.println("Connection done !");
+        drone = DroneControl.getInstance();
     }
 
     /**
@@ -50,8 +58,8 @@ public class DroneNetwork {
      * @param data
      * @throws IOException
      */
-    public void sendData(DroneControl data) throws IOException {
-        buffer = data.getJson().getBytes();
+    public void sendData(String data) throws IOException {
+        buffer = data.getBytes();
         dataSent = new DatagramPacket(buffer, buffer.length, adress, port);
         socket.setBroadcast(true);
         socket.send(dataSent);
@@ -66,33 +74,91 @@ public class DroneNetwork {
      */
     public boolean armDrone() throws IOException {
         // Send the request for Drone Armement
-        buffer = "{ArmDrone : True}".getBytes();
+        Request req = new RequestImpl(RequestType.ARM, new ArmDrone(true));
+        buffer = req.getRequest().getBytes();
         dataSent = new DatagramPacket(buffer, buffer.length, adress, port);
         socket.setBroadcast(true);
         socket.send(dataSent);
         System.out.println(" --- Asked for Drone Arming ... ");
 
         // Receiving the answer of the server
-        boolean returnValue = true;
+
         DatagramPacket response = new DatagramPacket(buffer, buffer.length);
         socket.receive(response);
         String received = new String( response.getData(), 0, response.getLength());
-
-        if(!received.contentEquals("{ArmDrone : True}")){
-            returnValue= false;
+        Request resp = req.receiveRequest(received);
+        ArmDrone droneState = new ArmDrone(resp);
+        if(!droneState.isArmed()){
+            return false;
         }
-
-        return returnValue;
+        drone.armDrone();
+        return true;
     }
 
-    public void disarmDrone() throws IOException {
+    public boolean disarmDrone() throws IOException {
         // Send the request for Drone Disarmament
-        buffer = "{ArmDrone : False}".getBytes();
+        Request req = new RequestImpl(RequestType.ARM, new ArmDrone(false));
+        //buffer = "{ArmDrone : False}".getBytes();
+        buffer = req.getRequest().getBytes();
         dataSent = new DatagramPacket(buffer, buffer.length, adress, port);
         socket.setBroadcast(true);
         socket.send(dataSent);
+
         System.out.println(" --- Asked for Drone Disarming ... ");
 
+        DatagramPacket response = new DatagramPacket(buffer, buffer.length);
+        socket.receive(response);
+        String received = new String( response.getData(), 0, response.getLength());
+        Request resp = req.receiveRequest(received);
+        ArmDrone droneState = new ArmDrone(resp);
+        if(droneState.isArmed()){
+            drone.disarmDrone();
+            return false;
+        }
+        return true;
+    }
+
+    public boolean takeOffDrone() throws IOException {
+        Request req = new RequestImpl(RequestType.TAKEOFF, new TakeOffDrone(true));
+        buffer = req.getRequest().getBytes();
+        dataSent = new DatagramPacket(buffer, buffer.length, adress, port);
+        socket.setBroadcast(true);
+        socket.send(dataSent);
+
+        System.out.println(" --- Asked for Drone TakeOff ... ");
+
+        DatagramPacket response = new DatagramPacket(buffer, buffer.length);
+        socket.receive(response);
+        String received = new String( response.getData(), 0, response.getLength());
+        System.out.println(received);
+        Request resp = req.receiveRequest(received);
+        TakeOffDrone droneState = new TakeOffDrone(resp);
+        if(!droneState.isTakeoff()){
+            return false;
+        }
+        drone.setTakeOff(true);
+        return true;
+    }
+
+    public boolean landDrone() throws IOException {
+        Request req = new RequestImpl(RequestType.TAKEOFF, new TakeOffDrone(false));
+        buffer = req.getRequest().getBytes();
+        dataSent = new DatagramPacket(buffer, buffer.length, adress, port);
+        socket.setBroadcast(true);
+        socket.send(dataSent);
+
+        System.out.println(" --- Asked for Drone TakeOff ... ");
+
+        DatagramPacket response = new DatagramPacket(buffer, buffer.length);
+        socket.receive(response);
+        String received = new String( response.getData(), 0, response.getLength());
+        Request resp = req.receiveRequest(received);
+        TakeOffDrone droneState = new TakeOffDrone(resp);
+        if(droneState.isTakeoff()){
+            return false;
+        }
+        drone.setTakeOff(false);
+        return true;
     }
 
     /**

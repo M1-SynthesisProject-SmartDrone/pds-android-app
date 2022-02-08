@@ -4,16 +4,24 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
+import Networkdata.RequestType;
+import communicationAPI.Request;
+import communicationAPI.RequestImpl;
+
 public class NetworkThread extends Thread{
     DroneNetwork client;
     DroneControl controller;
     volatile boolean running;
+    Request request;
     boolean isPrepared = false;
+    boolean isTakeOff;
     String ip;
     int port;
 
+
     public NetworkThread(String ip, String port){
         isPrepared = true;
+        isTakeOff = false;
         this.ip = ip;
         this.port = Integer.parseInt(port);
     }
@@ -36,13 +44,30 @@ public class NetworkThread extends Thread{
         client.disarmDrone() ;
         controller.disarmDrone();
     }
-    
+
+    public boolean takeOffDrone() throws IOException {
+        boolean isTakeOff = client.takeOffDrone();
+        if(isTakeOff){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean landDrone() throws IOException {
+        boolean isTakeOff = client.landDrone();
+        if(isTakeOff){
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public void run() {
-        if(isPrepared) {
+        if(isPrepared && isTakeOff) {
             try {
                 client = new DroneNetwork(ip, port);
                 controller = controller.getInstance();
+                request = new RequestImpl(RequestType.MANUAL_CONTROL, controller);
                 running = true;
             } catch (UnknownHostException e) {
                 System.out.println("UNKNOWNEXCEPTION ------------------------------------------");
@@ -62,7 +87,7 @@ public class NetworkThread extends Thread{
 
             while (running) {
                 try {
-                    client.sendData(controller);
+                    client.sendData(request.getRequest());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

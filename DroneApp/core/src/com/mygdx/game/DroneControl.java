@@ -2,11 +2,9 @@ package com.mygdx.game;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.Formatter;
 import java.util.HashMap;
 
 public class DroneControl {
@@ -21,11 +19,14 @@ public class DroneControl {
 
 
     boolean droneArmed;         // true if the drone is armed, false if not
-    boolean security;           // true if security is On, false if not
+
+    boolean isTakeOff;           // true if drone is flying, false if not
+
     float frontMove;            // indicate nature of front move by sign and intensity by the number | front is positive, back is negative
     float lateralMove;          // indicate nature of lateral move by sign and intensity by the number | left is negative, right is positive
     double motorPercentage;        // indicate percentage of drone motor power to use
     int rotation;               // -1 for left rotation, 1 for right rotation, 0 for no rotation
+
     NumberFormat format;           // to limit the number of digits for position
 
     private static DroneControl instance = null; // Singleton
@@ -36,7 +37,7 @@ public class DroneControl {
 
     private DroneControl(){
         droneArmed = false;
-        security = true;
+        isTakeOff = false;
         frontMove = 0;
         lateralMove = 0;
         motorPercentage = 0;
@@ -58,12 +59,12 @@ public class DroneControl {
     /**
      * Set the security to the other value
      */
-    public void switchSecurity(){
-        if(security){
-            security = false;
+    public void switchTakeOff(){
+        if(isTakeOff){
+            isTakeOff = false;
         }
         else{
-            security = true;
+            isTakeOff = true;
         }
     }
 
@@ -111,8 +112,8 @@ public class DroneControl {
      *
      * @param percentage
      */
-    public void updateMotorPercentage(int percentage){
-        if(percentage > 0 && percentage < 100){
+    public void updateMotorPercentage(double percentage){
+        if(percentage > -1 && percentage < 1){
             motorPercentage = percentage;
         }
     }
@@ -137,12 +138,12 @@ public class DroneControl {
         this.droneArmed = droneArmed;
     }
 
-    public boolean isSecurity() {
-        return security;
+    public boolean isTakeOff() {
+        return isTakeOff;
     }
 
-    public void setSecurity(boolean security) {
-        this.security = security;
+    public void setTakeOff(boolean takeOff) {
+        this.isTakeOff = takeOff;
     }
 
     public float getFrontMove() {
@@ -197,6 +198,6 @@ public class DroneControl {
     }
 
     public String toString(){
-        return "{\"forwardmove\" : "+ format.format(frontMove)+ " ,\"leftmove\":" + format.format(lateralMove) + ", \"motorpower\": " + format.format(motorPercentage) + ",\"leftrotation\" " + format.format(rotation)+"}";
+        return "{\"forwardmove\" : "+ format.format(frontMove)+ " ,\"leftmove\":" + format.format(lateralMove) + ", \"motorpower\": " + format.format(motorPercentage) + ",\"leftrotation\" " + format.format(rotation)+ " armed : " + this.droneArmed + " -- takeoff" + isTakeOff + "}";
     }
 }

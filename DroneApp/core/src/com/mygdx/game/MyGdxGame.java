@@ -2,10 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.assets.loaders.AssetLoader;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -18,30 +15,16 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.async.AsyncExecutor;
-import com.badlogic.gdx.utils.async.AsyncResult;
-import com.badlogic.gdx.utils.async.AsyncTask;
 
-import org.w3c.dom.events.Event;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.util.EventListener;
-import java.util.logging.FileHandler;
+
+import networkManager.NetworkManager;
 
 
 enum CurrentScreen{
@@ -170,7 +153,8 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 	TextField portField;
 	TextButton connexionButton;
 	TextButton returnButton;
-	NetworkThread networkThread;
+	NetworkManager manager;
+
 	boolean isThreadLaunched = false;
 	String connexionButtonText = " Connect";
 
@@ -304,14 +288,18 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 				if(!isThreadLaunched) {
 					String strPort = portField.getText();
 
-					networkThread = new NetworkThread(ipField.getText(), strPort);
+					try {
+						manager = new NetworkManager(ipField.getText(), Integer.parseInt(strPort));
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 
-					networkThread.start();
+					manager.startSendingThread();
 					screen = CurrentScreen.JOYSTICK;
 					isThreadLaunched = true;
 				}
 				else{
-					networkThread.stopThread();
+					manager.disconnect();
 					isThreadLaunched = false;
 				}
 			}
@@ -360,6 +348,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 		}
 
 		System.out.println(controller.toString());
+
 	}
 
 	private void renderConnexion(){
@@ -449,7 +438,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 
 		// on off engine button
 		renderer.begin(ShapeRenderer.ShapeType.Filled);
-		if (controller.isSecurity()) {
+		if (controller.isTakeOff()) {
 			renderer.setColor(Color.GREEN);
 		}
 		else{
@@ -506,7 +495,16 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 		Vector3 touchPos = new Vector3(screenX, Gdx.graphics.getHeight() - screenY, 0);
 		if(screen == CurrentScreen.JOYSTICK) {
 			if (engineControlRectangle.contains(touchPos.x, touchPos.y)) {
-				controller.switchSecurity();
+				controller.switchTakeOff();
+				if(controller.isTakeOff){
+					manager.takeOffDrone();
+				}
+				else{
+
+					manager.landDrone();
+
+				}
+
 			} else if (leftRotationRectangle.contains(touchPos.x, touchPos.y)) {
 				isRotatingLeft = true;
 				controller.leftRotation();
