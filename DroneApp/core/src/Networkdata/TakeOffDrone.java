@@ -8,12 +8,12 @@ public class TakeOffDrone {
 
     // --- Variables ---
 
-    private boolean isTakeoff;
+    private boolean takeOff;
 
     // --- Methods ---
 
-    public TakeOffDrone(boolean isTakeoff) {
-        this.isTakeoff = isTakeoff;
+    public TakeOffDrone(boolean takeOff) {
+        this.takeOff = takeOff;
     }
 
     public TakeOffDrone(Request request){
@@ -22,15 +22,15 @@ public class TakeOffDrone {
             String str = gson.toJson(request.getContent());
 
             TakeOffDrone bool = gson.fromJson(str, TakeOffDrone.class);
-            isTakeoff = bool.isTakeoff();
+            takeOff = bool.isTakeOff();
         }
     }
 
-    public boolean isTakeoff() {
-        return isTakeoff;
+    public boolean isTakeOff() {
+        return takeOff;
     }
 
-    public void setTakeoff(boolean takeoff) {
-        isTakeoff = takeoff;
+    public void setTakeOff(boolean takeOff) {
+        this.takeOff = takeOff;
     }
 }

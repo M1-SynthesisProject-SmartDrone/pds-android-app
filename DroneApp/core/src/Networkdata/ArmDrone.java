@@ -8,13 +8,13 @@ public class ArmDrone {
 
     // --- Variables ---
 
-    private boolean isArmed;
+    private boolean armDrone;
 
     // --- Methods ---
 
 
-    public ArmDrone(boolean isArmed) {
-        this.isArmed = isArmed;
+    public ArmDrone(boolean armed) {
+        this.armDrone = armed;
     }
 
     public ArmDrone(Request request){
@@ -23,16 +23,16 @@ public class ArmDrone {
             String str = gson.toJson(request.getContent());
 
             ArmDrone bool = gson.fromJson(str, ArmDrone.class);
-            isArmed = bool.isArmed();
+            armDrone = bool.isArmDrone();
         }
     }
 
-    public boolean isArmed() {
-        return isArmed;
+    public boolean isArmDrone() {
+        return armDrone;
     }
 
-    public void setArmed(boolean armed) {
-        isArmed = armed;
+    public void setArmDrone(boolean armDrone) {
+        this.armDrone = armDrone;
     }
 
 }

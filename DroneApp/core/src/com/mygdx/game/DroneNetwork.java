@@ -1,11 +1,9 @@
 package com.mygdx.game;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
@@ -14,7 +12,6 @@ import Networkdata.RequestType;
 import Networkdata.TakeOffDrone;
 import communicationAPI.Request;
 import communicationAPI.RequestImpl;
-import sun.awt.X11.XSystemTrayPeer;
 
 public class DroneNetwork {
 
@@ -88,7 +85,7 @@ public class DroneNetwork {
         String received = new String( response.getData(), 0, response.getLength());
         Request resp = req.receiveRequest(received);
         ArmDrone droneState = new ArmDrone(resp);
-        if(!droneState.isArmed()){
+        if(!droneState.isArmDrone()){
             return false;
         }
         drone.armDrone();
@@ -111,7 +108,7 @@ public class DroneNetwork {
         String received = new String( response.getData(), 0, response.getLength());
         Request resp = req.receiveRequest(received);
         ArmDrone droneState = new ArmDrone(resp);
-        if(droneState.isArmed()){
+        if(droneState.isArmDrone()){
             drone.disarmDrone();
             return false;
         }
@@ -133,7 +130,7 @@ public class DroneNetwork {
         System.out.println(received);
         Request resp = req.receiveRequest(received);
         TakeOffDrone droneState = new TakeOffDrone(resp);
-        if(!droneState.isTakeoff()){
+        if(!droneState.isTakeOff()){
             return false;
         }
         drone.setTakeOff(true);
@@ -154,7 +151,7 @@ public class DroneNetwork {
         String received = new String( response.getData(), 0, response.getLength());
         Request resp = req.receiveRequest(received);
         TakeOffDrone droneState = new TakeOffDrone(resp);
-        if(droneState.isTakeoff()){
+        if(droneState.isTakeOff()){
             return false;
         }
         drone.setTakeOff(false);

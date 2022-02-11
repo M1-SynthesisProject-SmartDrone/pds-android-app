@@ -1,7 +1,5 @@
 package communicationAPI;
 
-import java.awt.Point;
-
 import Networkdata.ArmDrone;
 import Networkdata.ControlDrone;
 import Networkdata.RequestType;
@@ -21,6 +19,6 @@ public class test {
 
         Request armreq = new RequestImpl(RequestType.ARM, new ArmDrone(true));
         ArmDrone arm = new ArmDrone(armreq);
-        System.out.println(arm.isArmed());
+        System.out.println(arm.isArmDrone());
     }
 }
