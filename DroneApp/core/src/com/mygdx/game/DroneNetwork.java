@@ -18,8 +18,7 @@ public class DroneNetwork {
     // ----------------------
     // Attributs
     // ----------------------
-    final static int taille = 1024;
-    static byte[] buffer;
+    final static int BUFFER_SIZE = 1024 * 8;
 
     private InetAddress adress;
     private int port;
@@ -43,8 +42,8 @@ public class DroneNetwork {
         adress = InetAddress.getByName(ip);
         //adress = InetAddress.getLocalHost();
         this.port = port;
-        socket = new DatagramSocket();
-        socket.setSoTimeout(30000);
+        socket = new DatagramSocket(port);
+        socket.setSoTimeout(10000);
         System.out.println("Connection done !");
         drone = DroneControl.getInstance();
     }
@@ -56,7 +55,7 @@ public class DroneNetwork {
      * @throws IOException
      */
     public void sendData(String data) throws IOException {
-        buffer = data.getBytes();
+        byte[] buffer = data.getBytes();
         dataSent = new DatagramPacket(buffer, buffer.length, adress, port);
         socket.setBroadcast(true);
         socket.send(dataSent);
@@ -72,7 +71,7 @@ public class DroneNetwork {
     public boolean armDrone() throws IOException {
         // Send the request for Drone Armement
         Request req = new RequestImpl(RequestType.ARM, new ArmDrone(true));
-        buffer = req.getRequest().getBytes();
+        byte[] buffer = req.getRequest().getBytes();
         dataSent = new DatagramPacket(buffer, buffer.length, adress, port);
         socket.setBroadcast(true);
         socket.send(dataSent);
@@ -80,8 +79,7 @@ public class DroneNetwork {
 
         // Receiving the answer of the server
 
-        DatagramPacket response = new DatagramPacket(buffer, buffer.length);
-        socket.receive(response);
+        DatagramPacket response = receiveResponse();
         String received = new String( response.getData(), 0, response.getLength());
         Request resp = req.receiveRequest(received);
         ArmDrone droneState = new ArmDrone(resp);
@@ -96,15 +94,14 @@ public class DroneNetwork {
         // Send the request for Drone Disarmament
         Request req = new RequestImpl(RequestType.ARM, new ArmDrone(false));
         //buffer = "{ArmDrone : False}".getBytes();
-        buffer = req.getRequest().getBytes();
+        byte[] buffer = req.getRequest().getBytes();
         dataSent = new DatagramPacket(buffer, buffer.length, adress, port);
         socket.setBroadcast(true);
         socket.send(dataSent);
 
         System.out.println(" --- Asked for Drone Disarming ... ");
 
-        DatagramPacket response = new DatagramPacket(buffer, buffer.length);
-        socket.receive(response);
+        DatagramPacket response = receiveResponse();
         String received = new String( response.getData(), 0, response.getLength());
         Request resp = req.receiveRequest(received);
         ArmDrone droneState = new ArmDrone(resp);
@@ -115,19 +112,24 @@ public class DroneNetwork {
         return true;
     }
 
+    private DatagramPacket receiveResponse() throws IOException {
+        byte[] responseBuffer = new byte[BUFFER_SIZE];
+        DatagramPacket response = new DatagramPacket(responseBuffer, responseBuffer.length);
+        socket.receive(response);
+        return response;
+    }
+
     public boolean takeOffDrone() throws IOException {
         Request req = new RequestImpl(RequestType.TAKEOFF, new TakeOffDrone(true));
-        buffer = req.getRequest().getBytes();
+        byte[] buffer = req.getRequest().getBytes();
         dataSent = new DatagramPacket(buffer, buffer.length, adress, port);
         socket.setBroadcast(true);
         socket.send(dataSent);
 
         System.out.println(" --- Asked for Drone TakeOff ... ");
 
-        DatagramPacket response = new DatagramPacket(buffer, buffer.length);
-        socket.receive(response);
+        DatagramPacket response = receiveResponse();
         String received = new String( response.getData(), 0, response.getLength());
-        System.out.println(received);
         Request resp = req.receiveRequest(received);
         TakeOffDrone droneState = new TakeOffDrone(resp);
         if(!droneState.isTakeOff()){
@@ -139,15 +141,15 @@ public class DroneNetwork {
 
     public boolean landDrone() throws IOException {
         Request req = new RequestImpl(RequestType.TAKEOFF, new TakeOffDrone(false));
-        buffer = req.getRequest().getBytes();
+        byte[] buffer = req.getRequest().getBytes();
         dataSent = new DatagramPacket(buffer, buffer.length, adress, port);
         socket.setBroadcast(true);
         socket.send(dataSent);
 
         System.out.println(" --- Asked for Drone TakeOff ... ");
 
-        DatagramPacket response = new DatagramPacket(buffer, buffer.length);
-        socket.receive(response);
+
+        DatagramPacket response = receiveResponse();
         String received = new String( response.getData(), 0, response.getLength());
         Request resp = req.receiveRequest(received);
         TakeOffDrone droneState = new TakeOffDrone(resp);

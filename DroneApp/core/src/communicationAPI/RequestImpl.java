@@ -48,6 +48,7 @@ public class RequestImpl implements Request{
     }
 
     public  Request receiveRequest(String json){
+        System.out.println(json);
         final Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Request req = gson.fromJson(json, RequestImpl.class);
         return req;
