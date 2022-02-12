@@ -32,10 +32,10 @@ public class SenderThread extends Thread{
 
     @Override
     public void run(){
+        System.out.println("Sender thread started");
         running = true;
         while (running) {
             if(drone.isDroneArmed() && drone.isTakeOff()) {
-                System.out.println("Thread Started");
                 // initialise drone communication
                 control.updateData(drone.getFrontMove(), drone.getLateralMove(), drone.getMotorPercentage(), drone.getRotation());
                 request = new RequestImpl(RequestType.MANUAL_CONTROL, control);
@@ -45,7 +45,6 @@ public class SenderThread extends Thread{
 
                 try {
                     client.sendData(request.getRequest());
-                    System.out.println("Thread running");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

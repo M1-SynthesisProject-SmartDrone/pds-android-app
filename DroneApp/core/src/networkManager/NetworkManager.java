@@ -62,6 +62,7 @@ public class NetworkManager {
     }
 
     public void startSendingThread(){
+        System.out.println("Start sending thread");
         sender.start();
     }
 

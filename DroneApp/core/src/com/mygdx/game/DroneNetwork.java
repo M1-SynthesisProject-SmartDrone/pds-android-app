@@ -59,7 +59,6 @@ public class DroneNetwork {
         dataSent = new DatagramPacket(buffer, buffer.length, adress, port);
         socket.setBroadcast(true);
         socket.send(dataSent);
-        System.out.println("NETWORK SEND DATAS : " + adress);
     }
 
     /**
